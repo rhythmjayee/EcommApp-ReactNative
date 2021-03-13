@@ -5,6 +5,7 @@ import morgan from 'morgan';
 import mongoose from 'mongoose';
 
 
+import Product from './models/product';
 
 dotenv.config({ silent: process.env.NODE_ENV === 'development' });
 mongoose.connect(process.env.DB_URL,{
@@ -43,10 +44,15 @@ app.get(`${api}/products`,(req,res)=>{
     res.send(products);
 });
 
-app.post(`${api}/products`,(req,res)=>{
-    const newProduct=req.body;
-    console.log(newProduct);
-    res.send(newProduct);
+app.post(`${api}/products`, async (req,res)=>{
+    const product= new Product({
+        name:req.body.name,
+        image:req.body.image,
+        countInStock:req.body.countInStock
+    });
+
+    const result = await product.save();
+    res.status(201).json(result);
 });
 
 
