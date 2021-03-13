@@ -6,7 +6,8 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 
 
-import  productRouter from './routes/products.js'
+import  productRouter from './routes/products.js';
+import categoryRouter from './routes/categories.js'
 
 
 dotenv.config({ silent: process.env.NODE_ENV === 'development' });
@@ -42,6 +43,8 @@ app.options('*',cors());
 
 //Routers
 app.use(`${api}/products`,productRouter);
+app.use(`${api}/categories`,categoryRouter);
+
 
 
 

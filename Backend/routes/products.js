@@ -29,10 +29,13 @@ router.post('/', async (req,res)=>{
             });
 
             const result = await product.save();
+            if(!result){
+                return res.status(404).send('the product cannot be created');
+            }
             res.status(201).json(result);
         }catch(err){
             res.status(500).json({
-                error:err,
+                error:{message:'Error occured'},
                 success:false
             })
         }
