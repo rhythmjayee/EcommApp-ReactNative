@@ -5,7 +5,10 @@ const Schema = mongoose.Schema;
 const productSchema= Schema({
     name:String,
     image:String,
-    countInStock:Number
+    countInStock:{
+        type: Number,
+        required: true
+    }
 });
 
 const Product = mongoose.model('Product',productSchema);
