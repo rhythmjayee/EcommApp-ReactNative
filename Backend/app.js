@@ -3,12 +3,15 @@ import express from 'express';
 import dotenv from 'dotenv';
 import morgan from 'morgan';
 import mongoose from 'mongoose';
+import cors from 'cors';
 
 
 import  productRouter from './routes/products.js'
 
-//DB connection
+
 dotenv.config({ silent: process.env.NODE_ENV === 'development' });
+
+//DB connection
 mongoose.connect(process.env.DB_URL,{
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -33,6 +36,8 @@ const app= express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(morgan('tiny')); 
+app.use(cors());
+app.options('*',cors());
 
 
 //Routers
