@@ -60,6 +60,23 @@ router.get('/get/totalSales',async (req,res)=>{
     
 });
 
+router.get('/get/count',async (req,res)=>{
+    try{
+        const count = await Order.countDocuments();
+
+        res.send({
+            orderCount:count
+        });
+
+    }catch(err){
+        res.status(500).json({
+                error:err,
+                success:false
+            })
+    }
+    
+});
+
 router.post('/', async (req,res)=>{
     try{
 
