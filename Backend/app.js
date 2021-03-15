@@ -8,6 +8,8 @@ import cors from 'cors';
 
 import  productRouter from './routes/products.js';
 import categoryRouter from './routes/categories.js'
+import userRouter from './routes/users.js'
+
 
 
 dotenv.config({ silent: process.env.NODE_ENV === 'development' });
@@ -44,18 +46,7 @@ app.options('*',cors());
 //Routers
 app.use(`${api}/products`,productRouter);
 app.use(`${api}/categories`,categoryRouter);
-
-
-
-
-
-
-
-
-
-
-
-
+app.use(`${api}/users`,userRouter);
 
 
 
