@@ -6,6 +6,7 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 
 
+import DBconnect from './DBconnection.js'
 import  productRouter from './routes/products.js';
 import categoryRouter from './routes/categories.js'
 import userRouter from './routes/users.js'
@@ -17,18 +18,7 @@ import errorHandler from './middleware/errorHandler.js';
 dotenv.config({ silent: process.env.NODE_ENV === 'development' });
 
 //DB connection
-mongoose.connect(process.env.DB_URL,{
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useCreateIndex: true,
-    useFindAndModify: false,
-    })
-    .then(con=>{
-        console.log('database connected!!')
-    })
-    .catch(err=>{
-        console.log('DB connection failed!!')
-    });
+DBconnect();
 
 
 // variables
