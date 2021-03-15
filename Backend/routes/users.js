@@ -40,6 +40,23 @@ router.get('/:id', async (req,res)=>{
 
 });
 
+router.get('/get/count',async (req,res)=>{
+    try{
+        const count = await User.countDocuments();
+
+        res.send({
+            userCount:count
+        });
+
+    }catch(err){
+        res.status(500).json({
+                error:err,
+                success:false
+            })
+    }
+    
+});
+
 router.post('/register', async (req,res)=>{
     try{ 
         let isEmailAvaiable = await User.findOne({email:req.body.email});
@@ -158,23 +175,23 @@ router.post('/login', async (req,res)=>{
 
 // });
 
-// router.delete('/:id', async (req,res)=>{
-//     try{ 
-//         const result = await Category.findByIdAndDelete(req.params.id);
+router.delete('/:id', async (req,res)=>{
+    try{ 
+        const result = await User.findByIdAndDelete(req.params.id);
 
-//         if(result)
-//         return res.status(201).json({success:true,message:'Category deleted successfully!!'});
-//         else
-//         return res.status(404).json({success:false,message:'Category not found!!'})
+        if(result)
+        return res.status(201).json({success:true,message:'User deleted successfully!!'});
+        else
+        return res.status(404).json({success:false,message:'User not found!!'})
 
-//     }catch(err){
-//         res.status(500).json({
-//             error:{message:'Error occured in deleting category'},
-//             success:false
-//         })
-//     }
+    }catch(err){
+        res.status(500).json({
+            error:{message:'Error occured in deleting User'},
+            success:false
+        })
+    }
 
-// });
+});
 
 
 export default router;
