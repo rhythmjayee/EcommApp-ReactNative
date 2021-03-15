@@ -53,6 +53,14 @@ router.post('/', async (req,res)=>{
         }))
         const orderItemsIdsResolved =  await orderItemsIds;
 
+        const totalPrices = await Promise.all(orderItemsIdsResolved.map(async (orderItemId)=>{
+            const orderItem = await OrderItem.findById(orderItemId).populate('product', 'price');
+            const totalPrice = orderItem.product.price * orderItem.quantity;
+            return totalPrice;
+        }))
+    
+        const totalPrice = totalPrices.reduce((a,b) => a +b , 0);
+
             const order = new Order({
                 orderItems:  orderItemsIdsResolved,
                 shippingAddress1: req.body.shippingAddress1,
@@ -62,7 +70,7 @@ router.post('/', async (req,res)=>{
                 country: req.body.country,
                 phone: req.body.phone,
                 status: req.body.status,
-                totalPrice:req.body.totalPrice,
+                totalPrice:totalPrice,
                 user: req.body.user,
             });
 
@@ -80,6 +88,50 @@ router.post('/', async (req,res)=>{
                 success:false
             })
         }
+
+});
+
+router.put('/:id', async (req,res)=>{
+    try{ 
+        const result = await Order.findByIdAndUpdate(req.params.id,
+        {
+            status:req.body.status
+        },
+        {new:true});
+
+        if(!result)
+        return res.status(404).json({success:false,message:'Order not found!!'})
+
+        res.status(200).send(result);
+
+    }catch(err){
+        res.status(500).json({
+            error:{message:'Error occured'},
+            success:false
+        })
+    }
+
+});
+
+router.delete('/:id', async (req,res)=>{
+    try{ 
+        const order = await Order.findByIdAndRemove(req.params.id);
+
+        if(order){
+            await order.orderItems.map(async orderItem=>{
+                await OrderItems.findByIdAndRemove(orderItem)
+            })
+            return res.status(201).json({success:true,message:'Order deleted successfully!!'});
+        }
+        else
+        return res.status(404).json({success:false,message:'Order not found!!'})
+
+    }catch(err){
+        res.status(500).json({
+            error:{message:'Error occured in deleting Order'},
+            success:false
+        })
+    }
 
 });
 
