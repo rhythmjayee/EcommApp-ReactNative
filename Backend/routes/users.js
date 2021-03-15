@@ -1,5 +1,6 @@
 import express from 'express';
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
 import User from '../models/user.js';
 
@@ -41,6 +42,16 @@ router.get('/:id', async (req,res)=>{
 
 router.post('/register', async (req,res)=>{
     try{ 
+        let isEmailAvaiable = await User.findOne({email:req.body.email});
+
+        if(isEmailAvaiable){
+            return res.status(400).json({
+                error:{
+                    message:'Email Id is already exist'
+                },
+                sucess:false
+            });
+        }
         let hash=bcrypt.hashSync(req.body.password,10);
             const user = new User({
                 name:req.body.name,
@@ -73,7 +84,7 @@ router.post('/register', async (req,res)=>{
 router.post('/login', async (req,res)=>{
     try{
 
-        let isEmailAvaiable = User.findOne({email:req.body.email});
+        let isEmailAvaiable = await User.findOne({email:req.body.email});
 
         if(!isEmailAvaiable){
             return res.status(400).json({
@@ -84,7 +95,7 @@ router.post('/login', async (req,res)=>{
             });
         }
 
-        let isPasswordCorrect=bcrypt.compareSync(req.body.password,isEmailAvaiable.passwordHash);
+        let isPasswordCorrect= bcrypt.compareSync(req.body.password,isEmailAvaiable.passwordHash);
         
         if(!isPasswordCorrect){
             return res.status(400).json({
@@ -95,25 +106,21 @@ router.post('/login', async (req,res)=>{
             });
         }
 
-        let hash=bcrypt.hashSync(req.body.password,10);
-            const user = new User({
-                name:req.body.name,
-                email:req.body.email,
-                passwordHash:hash,
-                phone:req.body.phone,
-                isAdmin:req.body.isAdmin,
-                apartment:req.body.apartment,
-                zip:req.body.zip,
-                city:req.body.city,
-                country:req.body.country
-            });
+            const token=jwt.sign(
+                {userId:isEmailAvaiable.id},
+                process.env.SECERT,
+                {expiresIn:'id'}
+            )
 
-            const result = await user.save();
-
-            if(!result){
-                return res.status(404).send('the user cannot be created');
+            if(!token){
+                return res.status(500).json({
+                    error:{
+                        message:'Some error occured in Logining User'
+                    },
+                    sucess:false,
+                })
             }
-            res.status(201).json(result);
+            res.status(200).send({user:isEmailAvaiable.email,token:token});
 
         }catch(err){
             res.status(500).json({
