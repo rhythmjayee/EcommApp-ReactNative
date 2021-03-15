@@ -9,6 +9,10 @@ import DBconnect from './DBconnection.js'
 import  productRouter from './routes/products.js';
 import categoryRouter from './routes/categories.js'
 import userRouter from './routes/users.js'
+import orderRouter from './routes/orders.js'
+
+
+
 import auth from './middleware/jwt.js';
 import errorHandler from './middleware/errorHandler.js';
 
@@ -41,6 +45,8 @@ app.use(errorHandler);
 app.use(`${api}/products`,productRouter);
 app.use(`${api}/categories`,categoryRouter);
 app.use(`${api}/users`,userRouter);
+app.use(`${api}/orders`,orderRouter);
+
 
 
 
