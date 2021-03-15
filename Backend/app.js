@@ -43,7 +43,7 @@ app.use(express.json());
 app.use(morgan('tiny')); 
 app.use(cors());
 app.options('*',cors());
-app.use(auth);
+app.use(auth());
 app.use(errorHandler);
 
 
