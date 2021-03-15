@@ -9,6 +9,8 @@ import cors from 'cors';
 import  productRouter from './routes/products.js';
 import categoryRouter from './routes/categories.js'
 import userRouter from './routes/users.js'
+import auth from './middleware/jwt.js';
+import errorHandler from './middleware/errorHandler.js';
 
 
 
@@ -41,6 +43,9 @@ app.use(express.json());
 app.use(morgan('tiny')); 
 app.use(cors());
 app.options('*',cors());
+app.use(auth);
+app.use(errorHandler);
+
 
 
 //Routers
@@ -54,4 +59,4 @@ app.use(`${api}/users`,userRouter);
 
 app.listen(3000,()=>{
     console.log('server running at PORT 3000');
-})
+});

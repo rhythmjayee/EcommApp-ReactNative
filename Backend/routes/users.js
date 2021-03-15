@@ -107,9 +107,12 @@ router.post('/login', async (req,res)=>{
         }
 
             const token=jwt.sign(
-                {userId:isEmailAvaiable.id},
+                {
+                    userId:isEmailAvaiable.id,
+                    isAdmin:isEmailAvaiable.isAdmin
+                },
                 process.env.SECERT,
-                {expiresIn:'id'}
+                {expiresIn:'1d'}
             )
 
             if(!token){
@@ -123,8 +126,10 @@ router.post('/login', async (req,res)=>{
             res.status(200).send({user:isEmailAvaiable.email,token:token});
 
         }catch(err){
-            res.status(500).json({
-                error:err,
+            res.status(500).send({
+                error:{
+                    message:err.message
+                },
                 success:false
             })
         }
