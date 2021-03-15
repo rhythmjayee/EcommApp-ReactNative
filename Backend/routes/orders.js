@@ -38,6 +38,28 @@ router.get('/:id',async (req,res)=>{
     
 });
 
+router.get('/get/totalSales',async (req,res)=>{
+    try{
+        const totalSales= await Order.aggregate([
+            { $group: { _id: null , totalsales : { $sum : '$totalPrice'}}}
+        ])
+    
+        if(!totalSales) {
+            return res.status(400).send('The order sales cannot be generated')
+        }
+    
+        res.send({totalsales: totalSales.pop().totalsales});
+
+    }catch(err){
+        console.log(err)
+        res.status(500).json({
+                error:err,
+                success:false
+            })
+    }
+    
+});
+
 router.post('/', async (req,res)=>{
     try{
 
