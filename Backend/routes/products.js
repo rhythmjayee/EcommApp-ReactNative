@@ -179,7 +179,7 @@ router.put('/gallery-images/:id', uploadOptions.array('images',10), async (req,r
         })
 
         let imagePaths=[];
-        const basePath = `${req.protocol}://${req.get('host')}/public/upload/`;
+        const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`;
 
         files.map(file=>{
             imagePaths.push(`${basePath}${file.filename}`)

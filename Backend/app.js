@@ -3,6 +3,10 @@ import express from 'express';
 import dotenv from 'dotenv';
 import morgan from 'morgan';
 import cors from 'cors';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+
 
 
 import DBconnect from './DBconnection.js'
@@ -27,6 +31,8 @@ DBconnect();
 // variables
 const api=process.env.API_URL;
 const app= express();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 
 
@@ -37,6 +43,7 @@ app.use(morgan('tiny'));
 app.use(cors());
 app.options('*',cors());
 app.use(auth());
+app.use('/public/uploads',express.static(__dirname + '/public/uploads'))
 app.use(errorHandler);
 
 
