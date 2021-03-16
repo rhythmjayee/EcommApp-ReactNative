@@ -1,5 +1,4 @@
 import express from 'express';
-// import multer from 'multer';
 import  fs from 'fs';
 
 
@@ -9,58 +8,6 @@ import uploadOptions from './Cloudinary/multer.js'
 import cloudinary from './Cloudinary/cloudinary.js'
 
 
-// const FILE_TYPE_MAP = {
-//     'image/png': 'png',
-//     'image/jpeg': 'jpeg',
-//     'image/jpg': 'jpg'
-// }
-
-// setting config for multer-----------------------------
-// const storage = multer.diskStorage({
-//     destination: function (req, file, cb) {
-//         const isValid = FILE_TYPE_MAP[file.mimetype];
-//         let uploadError = new Error('invalid image type');
-
-//         if(isValid) {
-//             uploadError = null
-//         }
-//       cb(uploadError, 'public/uploads')
-//     },
-//     filename: function (req, file, cb) {
-        
-//       const fileName = file.originalname.split(' ').join('-');
-//       const extension = FILE_TYPE_MAP[file.mimetype];
-//       cb(null, `${fileName}-${Date.now()}.${extension}`)
-//     }
-//   })
-  
-// const uploadOptions = multer({ storage: storage });
-//---------------------------------------------
-// const storage = multer.diskStorage({
-//     destination: function (req, file, cb) {
-//         cb(null, 'public/uploads')
-//     },
-//     filename: function (req, file, cb) {
-//         cb(null, new Date().toISOString() + '-' + file.originalname)
-//     }
-// })
-
-
-// const fileFilter = (req, file, cb) => {
-//     if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png' || file.mimetype === 'image/jpg') {
-//         cb(null, true)
-//     } else {
-//         //reject file
-//         cb({message: 'Unsupported file format'}, false)
-//     }
-// }
-
-// const upload = multer({
-//     storage: storage,
-//     limits: { fileSize: 1024 * 1024 },
-//     fileFilter: fileFilter
-// })
-//-------------------------------------------------------------------------
 
 const router = express.Router();
 
