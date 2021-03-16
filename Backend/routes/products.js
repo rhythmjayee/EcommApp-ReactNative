@@ -1,39 +1,41 @@
 import express from 'express';
-import multer from 'multer';
+// import multer from 'multer';
 import  fs from 'fs';
 
 
 import Product from '../models/product.js';
 import Category from '../models/category.js';
+import uploadOptions from './Cloudinary/multer.js'
+import cloudinary from './Cloudinary/cloudinary.js'
 
 
-const FILE_TYPE_MAP = {
-    'image/png': 'png',
-    'image/jpeg': 'jpeg',
-    'image/jpg': 'jpg'
-}
+// const FILE_TYPE_MAP = {
+//     'image/png': 'png',
+//     'image/jpeg': 'jpeg',
+//     'image/jpg': 'jpg'
+// }
 
-// setting config for multer
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        const isValid = FILE_TYPE_MAP[file.mimetype];
-        let uploadError = new Error('invalid image type');
+// setting config for multer-----------------------------
+// const storage = multer.diskStorage({
+//     destination: function (req, file, cb) {
+//         const isValid = FILE_TYPE_MAP[file.mimetype];
+//         let uploadError = new Error('invalid image type');
 
-        if(isValid) {
-            uploadError = null
-        }
-      cb(uploadError, 'public/uploads')
-    },
-    filename: function (req, file, cb) {
+//         if(isValid) {
+//             uploadError = null
+//         }
+//       cb(uploadError, 'public/uploads')
+//     },
+//     filename: function (req, file, cb) {
         
-      const fileName = file.originalname.split(' ').join('-');
-      const extension = FILE_TYPE_MAP[file.mimetype];
-      cb(null, `${fileName}-${Date.now()}.${extension}`)
-    }
-  })
+//       const fileName = file.originalname.split(' ').join('-');
+//       const extension = FILE_TYPE_MAP[file.mimetype];
+//       cb(null, `${fileName}-${Date.now()}.${extension}`)
+//     }
+//   })
   
-const uploadOptions = multer({ storage: storage })
-
+// const uploadOptions = multer({ storage: storage });
+//---------------------------------------------
 // const storage = multer.diskStorage({
 //     destination: function (req, file, cb) {
 //         cb(null, 'public/uploads')
@@ -58,7 +60,7 @@ const uploadOptions = multer({ storage: storage })
 //     limits: { fileSize: 1024 * 1024 },
 //     fileFilter: fileFilter
 // })
-
+//-------------------------------------------------------------------------
 
 const router = express.Router();
 
@@ -234,97 +236,109 @@ router.put('/gallery-images/:id', uploadOptions.array('images',10), async (req,r
 // https://cloudinary.com/blog/node_js_file_upload_to_a_local_server_or_to_the_cloud#step_2_set_up_file_uploads_to_cloudinary
 // https://medium.com/the-andela-way/how-to-upload-multiple-images-using-cloudinary-and-node-js-2f053b167b80#:~:text=Make%20sure%20you%20have%20NodeJS,is%20a%20very%20quick%20process.&text=After%20running%20all%20the%20commands,Create%20files%20called%20app.
 
-// const fileUpload = multer();
-// import cloudinary from 'cloudinary';
-// const cd=cloudinary.v2;
-// cloudinary.config({ 
-//     cloud_name: 'rhythmjayee', 
-//     api_key: '923146249665956', 
-//     api_secret: 'x7GssAf08MJANeYgUAqur9u1evo' 
-//   });
-// // import streamifier from 'streamifier';
 
-// const uploads = (file, folder) => {
-//     return new Promise(resolve => {
-//         cloudinary.uploader.upload(file, (result) => {
-//             resolve({
-//                 url: result.url,
-//                 id: result.public_id
-//             })
-//         }, {
-//             resource_type: "auto",
-//             folder: folder
-//         })
-//     })
-// }
+router.post('/cloud', uploadOptions.single('image') , async (req,res)=>{
+    try{
+            const category = await Category.findById(req.body.category);
+            if(!category){
+                return res.status(404).json({
+                    error:{message:'Invalid Category'},
+                    success:false
+                })
+            }
 
-// router.put('/gallery-images/cloud/:id', upload.array('images'), async (req,res)=>{
-//     //API_KEY=923146249665956
-//     //CLOUD_NAME=rhythmjayee
-//     // /CLOUDINARY_URL=cloudinary://923146249665956:x7GssAf08MJANeYgUAqur9u1evo@rhythmjayee
-//     try{
-//         const product = await Product.findById(req.params.id);
-//         if(!product){
-//             return res.status(404).json({
-//                 error:{message:'Invalid product'},
-//                 success:false
-//             })
-//         }
+            const file=req.file;
+            if(!file)
+            return res.status(400).json({
+                error:{message:'No Image file selected'},
+                success:false
+            })
 
-//         const files=req.files;
-//         console.log(files)
-//             // if(!file)
-//             // return res.status(400).json({
-//             //     error:{message:'No Image file selected'},
-//             //     success:false
-//             // })
-//         if(files.length==0)
-//         return res.status(400).json({
-//             error:{message:'No Image file selected'},
-//             success:false
-//         });
+            const uploader = async (path) => await cloudinary(path, 'Images');
 
-//         const uploader = async (path) => await uploads(path, 'Images');
+                const urls = []
+                const { path } = file;
+                console.log(path)
+                const newPath = await uploader(path)
+                urls.push(newPath.url)
+                fs.unlinkSync(path)
 
-//                 const urls = []
-//                 for (const file of files) {
-//                 const { path } = file;
-//                 const newPath = await uploader(path)
-//                 urls.push(newPath)
-//                 // fs.unlinkSync(path)
-//                 }
+            const product = new Product({
+                name:req.body.name,
+                description:req.body.description,
+                richDescription:req.body.richDescription,
+                image:urls[0],
+                brand:req.body.brand,
+                price:req.body.price,
+                category:req.body.category,
+                countInStock:req.body.countInStock,
+                rating:req.body.rating,
+                numReviews:req.body.numreviews,
+                isFeatured:req.body.isFeatured
+            });
 
-//                 res.status(200).json({
-//                 message: 'images uploaded successfully',
-//                 data: urls
-//                 })
+            const result = await product.save();
+            if(!result){
+                return res.status(500).send('the product cannot be created');
+            }
+            res.status(201).send(result);
+        }catch(err){
+            console.log(err);
+            res.status(500).json({
+                error:{message:'Error occured'},
+                success:false
+            })
+        }
 
+});
 
-        // let imagePaths=[];
-        // const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`;
+router.put('/gallery-images/cloud/:id', uploadOptions.array('images',5), async (req,res)=>{
+    try{
+        const product = await Product.findById(req.params.id);
+        if(!product){
+            return res.status(404).json({
+                error:{message:'Invalid product'},
+                success:false
+            })
+        }
 
-        // files.map(file=>{
-        //     imagePaths.push(`${basePath}${file.filename}`)
-        // })
+        const files=req.files;
+        console.log(files);
 
+        if(files.length==0)
+        return res.status(400).json({
+            error:{message:'No Image file selected'},
+            success:false
+        });
 
-        // const result = await Product.findByIdAndUpdate(req.params.id,{
-        //     images:imagePaths
-        // },
-        // {new:true});
+        const uploader = async (path) => await cloudinary(path, 'Images');
 
-        // if(!result){
-        //     return res.status(500).send('the product cannot be updated');
-        // }
-        // res.status(201).send(result);
-//     }catch(err){
-//         console.log(err);
-//         res.status(500).json({
-//             error:{message:'Error occured'},
-//             success:false
-//         })
-//     }
-// });
+                const urls = []
+                for (const file of files) {
+                const { path } = file;
+                console.log(path)
+                const newPath = await uploader(path)
+                urls.push(newPath.url)
+                fs.unlinkSync(path)
+                }
+
+        const result = await Product.findByIdAndUpdate(req.params.id,{
+            images:urls
+        },
+        {new:true});
+
+        if(!result){
+            return res.status(500).send('the product cannot be updated');
+        }
+        res.status(201).send(result);
+    }catch(err){
+        console.log(err);
+        res.status(500).json({
+            error:{message:'Error occured'},
+            success:false
+        })
+    }
+});
 
 router.put('/:id', async (req,res)=>{
     try{
