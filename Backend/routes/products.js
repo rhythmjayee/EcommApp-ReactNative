@@ -4,8 +4,8 @@ import  fs from 'fs';
 
 import Product from '../models/product.js';
 import Category from '../models/category.js';
-import uploadOptions from './Cloudinary/multer.js'
-import cloudinary from './Cloudinary/cloudinary.js'
+import uploadOptions from '../Cloudinary/multer.js'
+import cloudinary from '../Cloudinary/cloudinary.js'
 
 
 
